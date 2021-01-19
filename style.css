@@ -25,7 +25,7 @@ h1 {
 canvas {
   display: flex;
   justify-content: center;
-  background-color: rgb(204, 0, 255);
+  background-color: rgb(158, 6, 196);
   margin-left: 30%;
   margin-top: 10px;
 }

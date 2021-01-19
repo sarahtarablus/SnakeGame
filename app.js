@@ -82,133 +82,103 @@ const gameOverIfSnakeHitsTheWall = (interval) => {
     clearInterval(interval);
   }  
 }
- 
-const moveSnake = (e) => {
- if(clickCount === null){
-  if(e.keyCode === 39){
-    rightPressed = true;
-    const rightInt = setInterval(() => {
-    ctx.clearRect(0, 0, gameDisplay.width, gameDisplay.height);
-    snake.drawSnake();
-    apple.drawApple();
+
+
+const moveRight = () => {
+  ctx.clearRect(0, 0, gameDisplay.width, gameDisplay.height);
+  snake.drawSnake();
+  apple.drawApple();
+  if(clickCount === null){
     currentX = snake.x += dx;
-    currentY = snake.y;  
-    if(upPressed === true || downPressed === true){
-      clearInterval(rightInt);
-      rightPressed = false;
-    }
-   
-    gameOverIfSnakeHitsTheWall(rightInt);
-  }, 150);
-  }else if(e.keyCode === 37){
-    leftPressed = true;
-    const leftInt = setInterval(() => {
-    ctx.clearRect(0, 0, gameDisplay.width, gameDisplay.height);
-    snake.drawSnake();
-    apple.drawApple();
+    currentY = snake.y;
+  }else{
+    currentX = nextSnake.x += dx;
+    currentY = nextSnake.y;
+  } 
+}
+
+const moveLeft = () => {
+  ctx.clearRect(0, 0, gameDisplay.width, gameDisplay.height);
+  snake.drawSnake();
+  apple.drawApple();
+  if(clickCount === null){
     currentX = snake.x += -dx;
     currentY = snake.y;
-    if(rightPressed === true || downPressed === true || upPressed === true){
+  }else{
+    currentX = nextSnake.x += -dx;
+    currentY = nextSnake.y;
+  }
+} 
+
+const moveUp = () => {
+  ctx.clearRect(0, 0, gameDisplay.width, gameDisplay.height);
+  snake.drawSnake();
+  apple.drawApple ();
+  if(clickCount === null){
+    currentX = snake.x;
+    currentY = snake.y += -dy;
+  }else{
+    currentX = nextSnake.x;
+    currentY = nextSnake.y += -dy;
+  }
+}
+
+const moveDown = () => {
+  ctx.clearRect(0, 0, gameDisplay.width, gameDisplay.height);
+  snake.drawSnake();
+  apple.drawApple();
+  if(clickCount === null){
+    currentX = snake.x;
+    currentY = snake.y += dy;
+  }else{
+    currentX = nextSnake.x;
+    currentY = nextSnake.y += dy;
+  }  
+}
+
+const moveSnake = (e) => {
+  if(e.keyCode === 39){
+    rightPressed = true
+    const rightInt = setInterval(() => {
+      moveRight()
+      gameOverIfSnakeHitsTheWall(rightInt);
+      if(upPressed === true || leftPressed === true || downPressed === true){
+      clearInterval(rightInt);
+      rightPressed = false;
+      }
+    },150);
+  }else if(e.keyCode === 37){
+    leftPressed = true
+    const leftInt = setInterval(() => {
+      moveLeft()
+      gameOverIfSnakeHitsTheWall(leftInt);
+      if(rightPressed === true || upPressed === true || downPressed === true){
       clearInterval(leftInt);
       leftPressed = false;
       }
-      gameOverIfSnakeHitsTheWall(leftInt);
-    }, 150); 
+    },150)
   }else if(e.keyCode === 38){
-    upPressed = true;
+    upPressed = true
     const upInt = setInterval(() => {
-    ctx.clearRect(0, 0, gameDisplay.width, gameDisplay.height);
-    snake.drawSnake();
-    apple.drawApple ();
-    currentX = snake.x;
-    currentY = snake.y += -dy;
-    if(rightPressed === true || leftPressed === true || downPressed === true){
+      moveUp()
+      gameOverIfSnakeHitsTheWall(upInt);
+      if(rightPressed === true || leftPressed === true || downPressed === true){
       clearInterval(upInt);
       upPressed = false;
-    }
-    gameOverIfSnakeHitsTheWall(upInt);
-    }, 150);
-      
-   }else if(e.keyCode === 40){
-    downPressed = true;
+      }
+    },150);
+  }else if(e.keyCode === 40){
+    downPressed = true
     const downInt = setInterval(() => {
-    ctx.clearRect(0, 0, gameDisplay.width, gameDisplay.height);
-    snake.drawSnake();
-    apple.drawApple();
-    currentX = snake.x;
-    currentY = snake.y += dy;
-    if(upPressed === true || leftPressed === true || rightPressed === true){
+      moveDown()
+      gameOverIfSnakeHitsTheWall(downInt);
+      if(rightPressed === true || leftPressed === true || upPressed === true){
       clearInterval(downInt);
       downPressed = false;
-    }
-    gameOverIfSnakeHitsTheWall(downInt);
-    }, 150); 
-  }
-}else{
-    if(e.keyCode === 39){
-      rightPressed = true;
-      const rightInt = setInterval(() => {
-      ctx.clearRect(0, 0, gameDisplay.width, gameDisplay.height);
-      nextSnake.drawSnake();
-      apple.drawApple();
-      currentX = nextSnake.x += dx;
-      currentY = nextSnake.y;   
-      if(upPressed === true || downPressed === true){
-        clearInterval(rightInt);
-        rightPressed = false;
       }
-      snakeEatsTheApple;
-      gameOverIfSnakeHitsTheWall(rightInt);
-    }, 150);
-
-    }else if(e.keyCode === 38){
-      upPressed = true;
-      const upInt = setInterval(() => {
-      ctx.clearRect(0, 0, gameDisplay.width, gameDisplay.height);
-      nextSnake.drawSnake();
-      apple.drawApple();
-      currentX = nextSnake.x;
-      currentY = nextSnake.y += -dy; 
-      if(rightPressed === true || leftPressed === true || downPressed === true){
-        clearInterval(upInt);
-        upPressed = false;
-       }
-       gameOverIfSnakeHitsTheWall(upInt);
-     }, 150);
-    
-    }else if(e.keyCode === 40){
-      downPressed = true;
-      const downInt = setInterval(() => {
-      ctx.clearRect(0, 0, gameDisplay.width, gameDisplay.height);
-      nextSnake.drawSnake();
-      apple.drawApple();
-      currentX = nextSnake.x;
-      currentY = nextSnake.y += dy;
-      if(rightPressed === true || leftPressed === true || upPressed === true){
-        clearInterval(downInt);
-        downPressed = false;
-        }
-        gameOverIfSnakeHitsTheWall(downInt);
-      }, 150);
-     
-     }else if(e.keyCode === 37){
-        leftPressed = true;
-        const leftInt = setInterval(() => {
-        ctx.clearRect(0, 0, gameDisplay.width, gameDisplay.height);
-        nextSnake.drawSnake();
-        apple.drawApple();
-        currentX = nextSnake.x += -dx;
-        currentY = nextSnake.y;
-        if(rightPressed === true || downPressed === true || upPressed === true){
-          clearInterval(leftInt);
-          leftPressed = false;
-          }
-          gameOverIfSnakeHitsTheWall(leftInt);
-        }, 150); 
-      }      
-    }
+    },150);
   }
-
+}
 
 document.addEventListener('keydown', moveSnake);
 
