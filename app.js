@@ -1,6 +1,7 @@
 const gameDisplay = document.getElementById('game-display');
 const ctx  = gameDisplay.getContext('2d');
-const score = document.getElementById('score-output');
+const score = document.getElementById('score');
+
 
 let appleX =  Math.floor((Math.random() * (500 - 2) + 1));
 let appleY =  Math.floor((Math.random() * (340 -2) + 1));
@@ -18,7 +19,9 @@ let downPressed = false;
 
 let clickCount = null;
 let appleEaten = false;
-let pointsCount = null;
+let pointsCount = 0;
+let snakeNeedsToGrow = false;
+let a = 20 
 
 
 class Snake {
@@ -41,7 +44,7 @@ class Snake {
 
 const snake = new Snake(gameDisplay.width/10, gameDisplay.height/2, 10);
 const nextSnake = new Snake(currentX, currentY, 10, 10);
-const attachSnake = new Snake(currentX-10, currentY-10, 10, 10);
+const attachSnake = new Snake(200, 120, 10, 10);
 
 
 class Apple {
@@ -76,32 +79,27 @@ const gameOverIfSnakeHitsTheWall = (interval) => {
  if(snake.x + dx > gameDisplay.width || snake.x + 
   dx < 0){
     clearInterval(interval);
-    document.location.reload();  
+     
   }
  if(snake.y + dy > gameDisplay.height  || snake.y +  dy < 0){
     clearInterval(interval);
-    document.location.reload();  
+    
   } 
-  pointsCount = null; 
 }
 
 const createMovement = () => {
-  if(apple.status === 1){
    ctx.clearRect(0, 0, gameDisplay.width, gameDisplay.height);
    snake.drawSnake();
    apple.drawApple();
-  }else{
-    ctx.clearRect(0, 0, gameDisplay.width, gameDisplay.height);
-    snake.drawSnake();
-    apple.drawApple()
-  }
+   //attachSnake();
 }
+
 
 const moveRight = () => {
   createMovement();
   if(clickCount === null){
     currentX = snake.x += dx;
-    currentY = snake.y;
+    currentY = snake.y;  
   }else{
     currentX = nextSnake.x += dx;
     currentY = nextSnake.y;
@@ -149,7 +147,7 @@ const moveSnake = (e) => {
       newApple()
       gameOverIfSnakeHitsTheWall(rightInt);
       snakeEatsTheApple()
-      
+     
       if(upPressed === true || downPressed === true){
       clearInterval(rightInt);
       rightPressed = false;
@@ -175,8 +173,8 @@ const moveSnake = (e) => {
       newApple()
       gameOverIfSnakeHitsTheWall(upInt);
       snakeEatsTheApple()
-      
-      if(rightPressed === true || leftPressed === true ){
+    
+      if(rightPressed === true || leftPressed === true){
       clearInterval(upInt);
       upPressed = false;
       }
@@ -208,13 +206,46 @@ const snakeEatsTheApple = () => {
   if(distance < snake.radius + (apple.radius/2)){
     apple.x = -30;
     apple.y = -30;
-    pointsCount ++;
-    console.log(pointsCount);
+    pointsCount++
     appleEaten = true;
-    score.textContent = `${pointsCount}`
-    snakeGrows();
+    score.textContent = `Score :  ${pointsCount}`;
+    snakeNeedsToGrow = true;
   } 
+  snakeGrows()
 }
+
+const increaseACount = () => {
+   if(pointsCount > 1){
+     a = Number(20 * pointsCount)
+   }
+}
+
+
+const snakeGrows = () => {
+  let x;
+  let y;
+  
+  if(snakeNeedsToGrow === true){
+    if(rightPressed === true){
+        x = currentX - a
+        y = currentY
+        new Snake(x, y, 10, 10).drawSnake()
+    }else if(leftPressed === true){
+        x = currentX + a
+        y = currentY
+        new Snake(x, y, 10, 10).drawSnake()
+    }else if(upPressed === true){
+        x = currentX 
+        y = currentY + a
+        new Snake(x, y, 10, 10).drawSnake()
+    }else if(downPressed === true){
+        x = currentX 
+        y = currentY - a 
+        new Snake(x, y, 10, 10).drawSnake()
+    }
+  }
+}
+
 
 const newApple = () => {
   if(appleEaten === true){
@@ -224,9 +255,14 @@ const newApple = () => {
   } 
 }
 
-const snakeGrows = () => {
- attachSnake.drawSnake();
+const btn = document.getElementById('play-again-btn');
+
+const playAgain = () => {
+  document.location.reload(); 
+  pointsCount = 0;
 }
+
+btn.addEventListener('click', playAgain);
 
 
 

@@ -31,8 +31,7 @@ canvas {
 }
 
 .container-2 {
-  
-  
+  font-size: 20px;
   width: 500px;
   height: 80px;
   padding: 0px;
@@ -44,6 +43,18 @@ canvas {
 }
 
 h2 {
-  padding-left: 15px;
-  padding-top: 20px;
+  float: left;
+  margin-left: 10px;
+  padding-top: 18px;
+}
+
+button {
+  float: right;
+  padding: 10px;
+  height: 80px;
+  border-radius: 10px;
+  background-color:  rgb(255, 0, 76);
+  border: white;
+  color: white;
+  font-size: 13px;;
 }
