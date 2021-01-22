@@ -3,8 +3,8 @@ const ctx  = gameDisplay.getContext('2d');
 const score = document.getElementById('score');
 
 
-let appleX =  Math.floor((Math.random() * (500 - 2) + 1));
-let appleY =  Math.floor((Math.random() * (340 -2) + 1));
+let appleX =  Math.floor((Math.random() * (450 - 20) + 1));
+let appleY =  Math.floor((Math.random() * (300 -20) + 1));
 
 
 let currentX = null
@@ -67,8 +67,6 @@ class Apple {
 }
 
 const apple = new Apple(appleX, appleY, 10, 'red');
-
-
 
 window.onload = () => {
   snake.drawSnake();
@@ -251,8 +249,8 @@ const snakeGrows = () => {
 const newApple = () => {
   if(appleEaten === true){
     appleEaten = false;
-    apple.x = Math.floor((Math.random() * (500 - 1) + 1));
-    apple.y = Math.floor((Math.random() * (340 - 1) + 1));
+    apple.x = Math.floor((Math.random() * (450 - 20) + 1));
+    apple.y = Math.floor((Math.random() * (300 - 20) + 1));
   } 
 }
 
