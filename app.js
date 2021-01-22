@@ -224,7 +224,7 @@ const increaseACount = () => {
 const snakeGrows = () => {
   let x;
   let y;
-  
+  increaseACount();
   if(snakeNeedsToGrow === true){
     if(rightPressed === true){
         x = currentX - a
