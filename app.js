@@ -77,12 +77,12 @@ const gameOverIfSnakeHitsTheWall = (interval) => {
  if(snake.x + dx > gameDisplay.width || snake.x + 
   dx < 0){
     clearInterval(interval);
-    alert('GAME OVER')
+    score.textContent = 'GAME OVER!'
      
   }
  if(snake.y + dy > gameDisplay.height  || snake.y +  dy < 0){
     clearInterval(interval);
-    alert('GAME OVER')
+    score.textContent = 'GAME OVER!'
   } 
 }
 
