@@ -7,10 +7,10 @@ let appleX =  Math.floor((Math.random() * (450 - 20) + 1));
 let appleY =  Math.floor((Math.random() * (300 -20) + 1));
 
 
-let currentX = null
+let currentX = null;
 let currentY = null;
-let dx = 8;
-let dy = -8;
+let dx = 10;
+let dy = 10;
 
 let rightPressed = false;
 let leftPressed = false;
@@ -25,14 +25,12 @@ let a = 20
 
 
 class Snake {
-  constructor(x, y, radius, position){
+  constructor(x, y, radius){
    this.x = x;
    this.y = y;
    this.radius = radius;
   }
-  get snake() {
-    return this.drawSnake();
-  }
+
   drawSnake () {
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
@@ -41,11 +39,6 @@ class Snake {
     ctx.closePath();
   }
 }
-
-const snake = new Snake(gameDisplay.width/10, gameDisplay.height/2, 10);
-const nextSnake = new Snake(currentX, currentY, 10, 10);
-const attachSnake = new Snake(200, 120, 10, 10);
-
 
 class Apple {
   constructor(x, y, radius, color){
@@ -66,138 +59,147 @@ class Apple {
   } 
 }
 
+
+const snake = {
+   body: [ new Snake(50, 200, 10),
+           new Snake(40, 200, 10)
+         ],
+   direction: null,
+
+   copyPositions: [ new Snake(50, 200, 10),
+                    new Snake(40, 200, 10)
+                  ],
+}
+
+let headX = snake.body[0].x
+let headY = snake.body[0].y
+       
 const apple = new Apple(appleX, appleY, 10, 'red');
 
 window.onload = () => {
-  snake.drawSnake();
+  createSnake();
   apple.drawApple();
 }
 
-const gameOverIfSnakeHitsTheWall = (interval) => {
- if(snake.x + dx > gameDisplay.width || snake.x + 
+const createSnake= () => {
+   snake.body.forEach((piece) => {
+     piece.drawSnake()
+   })
+  }
+ 
+const createMovement = () => {
+   ctx.clearRect(0, 0, gameDisplay.width, gameDisplay.height);
+   createSnake();
+   apple.drawApple();
+}
+
+const rightDirection = () => {
+  rightPressed = true;
+  clickCount === null ? (currentX = headX += dx) : (currentX += dx)
+}
+
+const leftDirection = () => {
+  leftPressed = true;
+  clickCount === null ? (currentX = headX += -dx) : (currentX += -dx)
+}
+
+const upDirection = () => {
+  upPressed = true;
+  clickCount === null ? (currentY = headY += dy) : (currentY += dy)
+}
+
+const downDirection = () => {
+  downPressed = true;
+  clickCount === null ? (currentY = headY += -dy) : (currentY += -dy)
+}
+
+
+
+const moveSnakeHead = (e) => {
+    createMovement();
+    //let direction = snake.direction;
+    if(e.keyCode === 39){
+      const rightInt = setInterval(() => {
+        rightDirection()
+        if(upPressed === true || downPressed === true){
+        clearInterval(rightInt);
+        rightPressed = false;
+        }
+      },100);
+    }else if(e.keyCode === 37){
+      const leftInt = setInterval(() => {
+        leftDirection()
+        if(upPressed === true || downPressed === true){
+        clearInterval(leftInt);
+        leftPressed = false;
+        }
+      },100)
+      
+    }else if(e.keyCode === 38){
+      const upInt = setInterval(() => {
+        upDirection()
+        if(rightPressed === true || leftPressed === true){
+        clearInterval(upInt);
+        upPressed = false;
+        }
+      },100);
+    }else if(e.keyCode === 40){
+      const downInt = setInterval(() => {
+        downDirection()
+        if(rightPressed === true || leftPressed === true){
+        clearInterval(downInt);
+        downPressed = false;
+        }
+      },100); 
+    }
+  }
+
+  
+
+  
+
+
+
+/*const moveSnakeHead = (e) => {
+  setInterval(() => {
+    directionSnakeHead();
+    if(snake.direction === right){
+      clickCount === null ? currentX = headX += dx : currentX += dx
+    }else if(snake.direction === left){
+      clickCount === null ? currentX = headX += -dx : currentX += -dx
+    }else if(snake.direction === up){
+      clickCount === null ? currentY = headY += dy : currentY += dY
+    }else if(snake.direction === down){
+      clickCount === null ? currentY = headY += -dy : currentY += -dY
+    }
+  }, 10)
+  
+}*/
+
+
+
+
+
+
+/*const gameOverIfSnakeHitsTheWall = (interval) => {
+ 
+ if(snakeArray[0][0].x + dx > gameDisplay.width || snakeArray[0][0].x + 
   dx < 0){
     clearInterval(interval);
     score.textContent = 'GAME OVER!'
      
   }
- if(snake.y + dy > gameDisplay.height  || snake.y +  dy < 0){
+ if(snakeArray[0][0].y + dy > gameDisplay.height  || snakeArray[0][0].y + dy  < 0){
     clearInterval(interval);
     score.textContent = 'GAME OVER!'
   } 
-}
-
-const createMovement = () => {
-   ctx.clearRect(0, 0, gameDisplay.width, gameDisplay.height);
-   snake.drawSnake();
-   apple.drawApple();
-   //attachSnake();
-}
+}*/
 
 
-const moveRight = () => {
-  createMovement();
-  if(clickCount === null){
-    currentX = snake.x += dx;
-    currentY = snake.y;  
-  }else{
-    currentX = nextSnake.x += dx;
-    currentY = nextSnake.y;
-  } 
-}
-
-const moveLeft = () => {
-  createMovement();
-  if(clickCount === null){
-    currentX = snake.x += -dx;
-    currentY = snake.y;
-  }else{
-    currentX = nextSnake.x += -dx;
-    currentY = nextSnake.y;
-  }
-} 
-
-const moveUp = () => {
-  createMovement();
-  if(clickCount === null){
-    currentX = snake.x;
-    currentY = snake.y += dy;
-  }else{
-    currentX = nextSnake.x;
-    currentY = nextSnake.y += dy;
-  }
-}
-
-const moveDown = () => {
-  createMovement();
-  if(clickCount === null){
-    currentX = snake.x;
-    currentY = snake.y += -dy;
-  }else{
-    currentX = nextSnake.x;
-    currentY = nextSnake.y += -dy;
-  }  
-}
-
-const moveSnake = (e) => {
-  if(e.keyCode === 39){
-    rightPressed = true
-    const rightInt = setInterval(() => {
-      moveRight()
-      newApple()
-      gameOverIfSnakeHitsTheWall(rightInt);
-      snakeEatsTheApple()
-     
-      if(upPressed === true || downPressed === true){
-      clearInterval(rightInt);
-      rightPressed = false;
-      }
-    },100);
-  }else if(e.keyCode === 37){
-    leftPressed = true
-    const leftInt = setInterval(() => {
-      moveLeft()
-      newApple()
-      gameOverIfSnakeHitsTheWall(leftInt);
-      snakeEatsTheApple()
-      
-      if(upPressed === true || downPressed === true){
-      clearInterval(leftInt);
-      leftPressed = false;
-      }
-    },100)
-  }else if(e.keyCode === 38){
-    upPressed = true
-    const upInt = setInterval(() => {
-      moveUp()
-      newApple()
-      gameOverIfSnakeHitsTheWall(upInt);
-      snakeEatsTheApple()
-    
-      if(rightPressed === true || leftPressed === true){
-      clearInterval(upInt);
-      upPressed = false;
-      }
-    },100);
-  }else if(e.keyCode === 40){
-    downPressed = true
-    const downInt = setInterval(() => {
-      moveDown()
-      newApple()
-      gameOverIfSnakeHitsTheWall(downInt);
-      snakeEatsTheApple()
-      
-      if(rightPressed === true || leftPressed === true){
-      clearInterval(downInt);
-      downPressed = false;
-      }
-    },100);
-  }
-}
-
-document.addEventListener('keydown', moveSnake);
+document.addEventListener('keydown', moveSnakeHead);
 
   
-const snakeEatsTheApple = () => {
+/*const snakeEatsTheApple = () => {
   let x = snake.x - apple.x;
   let y = snake.y - apple.y;
   let distance = Math.sqrt(x * x + y * y);
@@ -217,7 +219,7 @@ const increaseACount = () => {
    if(pointsCount > 1){
      a = Number(20 * pointsCount)
    }
-}
+}*/
 
 
 const snakeGrows = () => {
