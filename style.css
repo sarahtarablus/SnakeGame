@@ -26,18 +26,18 @@ canvas {
   display: flex;
   justify-content: center;
   background-color: rgb(158, 6, 196);
-  margin-left: 30%;
+  margin-left: 36%;
   margin-top: 10px;
 }
 
 .container-2 {
   font-size: 20px;
-  width: 500px;
+  width: 400px;
   height: 80px;
   padding: 0px;
   background-color: rgb(134, 230, 26);
   margin-top: 50px;
-  margin-left: 30%;
+  margin-left: 36%;
   border-radius: 10px;
   color: white;
 }

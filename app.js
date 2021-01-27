@@ -4,7 +4,7 @@ const score = document.getElementById('score');
 
 
 let appleX =  Math.floor((Math.random() * (450 - 20) + 1));
-let appleY =  Math.floor((Math.random() * (300 -20) + 1));
+let appleY =  Math.floor((Math.random() * (250 -20) + 1));
 
 
 let currentX = null;
@@ -30,7 +30,6 @@ class Snake {
    this.y = y;
    this.radius = radius;
   }
-
   drawSnake () {
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
@@ -160,7 +159,7 @@ const moveSnakeHead = (e) => {
 
 
 
-/*const moveSnakeHead = (e) => {
+const moveSnakeHead = (e) => {
   setInterval(() => {
     directionSnakeHead();
     if(snake.direction === right){
@@ -174,14 +173,14 @@ const moveSnakeHead = (e) => {
     }
   }, 10)
   
-}*/
+}
 
 
 
 
 
 
-/*const gameOverIfSnakeHitsTheWall = (interval) => {
+const gameOverIfSnakeHitsTheWall = (interval) => {
  
  if(snakeArray[0][0].x + dx > gameDisplay.width || snakeArray[0][0].x + 
   dx < 0){
@@ -193,13 +192,13 @@ const moveSnakeHead = (e) => {
     clearInterval(interval);
     score.textContent = 'GAME OVER!'
   } 
-}*/
+}
 
 
 document.addEventListener('keydown', moveSnakeHead);
 
   
-/*const snakeEatsTheApple = () => {
+const snakeEatsTheApple = () => {
   let x = snake.x - apple.x;
   let y = snake.y - apple.y;
   let distance = Math.sqrt(x * x + y * y);
