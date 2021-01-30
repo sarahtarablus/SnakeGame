@@ -20,9 +20,7 @@ let currentY = null;
 let direction = null;
 
 let currPositionHead = [];
-//let prevPosition = null;
-//let currPosition = null;
-
+let previousPositions = [];
 
 let randomAppleX =  (Math.floor((Math.random() * (390 /10))) *10) + 10;
 let randomAppleY =  (Math.floor((Math.random() * (290 /10))) *10) + 10;
@@ -63,8 +61,7 @@ const apple = new Apple(randomAppleX, randomAppleY, 10);
 
 const snake = {
   head: [new Snake(40, 150, 10)],
-  body: [
-         new Snake(30, 150, 10),
+  body: [new Snake(20, 150, 10)
         ],
   currentPositionHead: [],
   prevPositionHead: [],
@@ -73,6 +70,10 @@ const snake = {
 let snakeHead = snake.head[0];
 let snakeDirection = snake.direction;
 
+let snakeCopy = {
+  currentPositionHead : [],
+  prevPositionHead: [],
+}
 
 
 const createApple = () => {
@@ -80,15 +81,14 @@ const createApple = () => {
 }
 
 const createSnakeHead = () => {
-  snakeHead.drawSnake()
+  snakeHead.drawSnake();
 }
 
 const createSnakeBody = () => {
-  snake.body.forEach((piece) => {
-    piece.drawSnake();
+  snake.body.forEach((part) => {
+    part.drawSnake();
   })
 }
-
 
 window.onload = () => {
   createSnakeHead()
@@ -97,13 +97,25 @@ window.onload = () => {
 }
 
 const updateCurrentPosition = () => {
-  currPositionHead.push([snakeHead.x ,snakeHead.y])
-  snake.currentPositionHead = currPositionHead[currPositionHead.length - 1];
+  currPositionHead.push([snakeHead.x, snakeHead.y])
+  snake.currentPositionHead = currPositionHead[currPositionHead.length - 1]
   snake.prevPositionHead = currPositionHead[currPositionHead.length - 2];
-  //console.log('curr' + snake.prevPositionHead)
+  previousPositions.push(snake.prevPositionHead);
+  
+  for(let i = currPositionHead.length -2; i >= 0; i--){
+      console.log( currPositionHead[i][1])
+  }
+  //console.log('a', previousPositions)
+
+  //snakeCopy.currentPositionHead = snake.prevPositionHead;
+  //console.log( snake.currentPositionHead)
+  
+  if(Array.isArray(snake.prevPositionHead)){
+    snake.body[0].x = snake.prevPositionHead[0]
+    snake.body[0].y = snake.prevPositionHead[1]
+  }
 }
-updateCurrentPosition()
-console.log('curr' + snake.prevPositionHead)
+
 
 
 const snakeMovement = () => {
@@ -112,10 +124,8 @@ const snakeMovement = () => {
   createSnakeBody()
   createApple()
   updateCurrentPosition(); 
-  //console.log('current' + currPosition)
-  //console.log('prev' + prevPosition)
 }
-updateCurrentPosition()
+
 
 const right = () => {
   currentX = snakeHead.x += dx;
@@ -140,12 +150,10 @@ const down = () => {
 
  
 const moveSnake = (e) => {
-  console.log(snakeDirection)
   if(isGameOver === false){
   if(e.keyCode === 39){
     isRightPressed = true;
     snakeDirection = 'right';
-
     const rightInt = setInterval(() => {
       snakeMovement()
       right()
@@ -158,7 +166,6 @@ const moveSnake = (e) => {
    }, 100)  
   }else if(e.keyCode === 37){
     snakeDirection = 'left';
-   
     isLeftPressed = true;
     const leftInt = setInterval(() => {
       snakeMovement()
@@ -172,7 +179,6 @@ const moveSnake = (e) => {
    }, 100)  
   }else if(e.keyCode === 38){
     snakeDirection = 'up';
-   
     isUpPressed = true;
     const upInt = setInterval(() => {
       snakeMovement()
@@ -186,7 +192,6 @@ const moveSnake = (e) => {
    }, 100)   
   }else if(e.keyCode === 40){
     snakeDirection = 'down';
-   
     isDownPressed = true;
     const downInt = setInterval(() => {
       snakeMovement()
@@ -227,6 +232,12 @@ const updatePoints = () => {
   score.textContent = `Score :  ${pointsCount}`;
 }
 
+const snakeGrows = () => {
+  if(snakeNeedsToGrow === true){
+    snake.body.push(new Snake(60, 100, 10))
+  }
+}
+
 const snakeEatsTheApple = () => {
   let x = snakeHead.x - apple.x;
   let y = snakeHead.y - apple.y;
@@ -237,6 +248,7 @@ const snakeEatsTheApple = () => {
     apple.y = -30;
     updatePoints()
     newApple()
+    snakeGrows()
   } 
 }
 
