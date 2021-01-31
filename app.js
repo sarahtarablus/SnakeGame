@@ -18,9 +18,14 @@ let isGameOver = false;
 let currentX = null;
 let currentY = null;
 let direction = null;
+let point = -2
+let snakeNeedsToGrow = false
 
-let currPositionHead = [];
+
+let currPositionsHead = [];
 let previousPositions = [];
+
+let nextPosition = []
 
 let randomAppleX =  (Math.floor((Math.random() * (390 /10))) *10) + 10;
 let randomAppleY =  (Math.floor((Math.random() * (290 /10))) *10) + 10;
@@ -61,20 +66,15 @@ const apple = new Apple(randomAppleX, randomAppleY, 10);
 
 const snake = {
   head: [new Snake(40, 150, 10)],
-  body: [new Snake(20, 150, 10)
-        ],
+  
+  body: [new Snake(20, 150, 10)],
   currentPositionHead: [],
   prevPositionHead: [],
+  nextPrevPositions: [],
   direction: null
 }
 let snakeHead = snake.head[0];
 let snakeDirection = snake.direction;
-
-let snakeCopy = {
-  currentPositionHead : [],
-  prevPositionHead: [],
-}
-
 
 const createApple = () => {
   apple.drawApple();
@@ -96,24 +96,60 @@ window.onload = () => {
   createApple()
 }
 
-const updateCurrentPosition = () => {
-  currPositionHead.push([snakeHead.x, snakeHead.y])
-  snake.currentPositionHead = currPositionHead[currPositionHead.length - 1]
-  snake.prevPositionHead = currPositionHead[currPositionHead.length - 2];
-  previousPositions.push(snake.prevPositionHead);
-  
-  for(let i = currPositionHead.length -2; i >= 0; i--){
-      console.log( currPositionHead[i][1])
+/*const snakeGrows = (x, y) => {
+  if(snakeNeedsToGrow === true){
+    let part = snake.body.shift()
+       snake.body.push(part);
+    new Snake(x, y, 10)
   }
+}*/
+
+
+
+const updateCurrentPosition = () => {
+  currPositionsHead.push([snakeHead.x, snakeHead.y])
+  snake.currentPositionHead = currPositionsHead[currPositionsHead.length - 1]
+  snake.prevPositionHead = currPositionsHead[currPositionsHead.length - 2];
+  snake.nextPrevPosition = currPositionsHead[currPositionsHead.length + point];
+  if(Array.isArray(snake.prevPositionHead) && Array.isArray(snake.nextPrevPosition) ){
+    snake.body[0].x = snake.prevPositionHead[0]
+    snake.body[0].y = snake.prevPositionHead[1]
+    if(snakeNeedsToGrow === true){
+      if(Array.isArray(snake.nextPrevPosition)){
+          snake.body.push(new Snake(snake.nextPrevPosition[0], snake.nextPrevPosition[1], 10))
+          if(snake.body.length > (pointsCount)){
+            snake.body.shift()
+       }
+     }
+    }
+  }
+
+  
+  
+   // for(let i = currPositionsHead.length - 3;i < currPositionsHead.length - 2 ; i++ ){
+     //let positionX = currPositionsHead[currPositionsHead.length + point][1]
+  //snake.nextPrevPosition = (currPositionsHead[currPositionsHead.length - 3])
+   
+     //}
+    //}
+     //console.log(currPositionsHead[currPositionsHead.length - 2] + 1)
+     //if(pointsCount > 0){
+       
+      //  console.log(currPositionsHead[currPositionsHead.length - 2])
+     // }
+  
+  //let positions = [currPositionsHead[currPositionsHead.length - 3]
+  //currPositionsHead.filter(item => positions)
+     
+  //})
+  
+  //}
   //console.log('a', previousPositions)
 
   //snakeCopy.currentPositionHead = snake.prevPositionHead;
   //console.log( snake.currentPositionHead)
   
-  if(Array.isArray(snake.prevPositionHead)){
-    snake.body[0].x = snake.prevPositionHead[0]
-    snake.body[0].y = snake.prevPositionHead[1]
-  }
+ 
 }
 
 
@@ -227,16 +263,14 @@ const gameOverIfSnakeHitsTheWall = (interval) => {
 
 const updatePoints = () => {
   pointsCount++
+  point--
+  console.log(point)
   isAppleEaten = true;
   snakeNeedsToGrow = true;
   score.textContent = `Score :  ${pointsCount}`;
 }
 
-const snakeGrows = () => {
-  if(snakeNeedsToGrow === true){
-    snake.body.push(new Snake(60, 100, 10))
-  }
-}
+
 
 const snakeEatsTheApple = () => {
   let x = snakeHead.x - apple.x;
@@ -248,7 +282,7 @@ const snakeEatsTheApple = () => {
     apple.y = -30;
     updatePoints()
     newApple()
-    snakeGrows()
+    snakeNeedsToGrow = true
   } 
 }
 
@@ -272,5 +306,4 @@ const playAgain = () => {
 }
 
 btn.addEventListener('click', playAgain);
-
 
