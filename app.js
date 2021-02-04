@@ -1,3 +1,5 @@
+const DEBUG = true;
+
 const gameDisplay = document.getElementById('game-display');
 const ctx  = gameDisplay.getContext('2d');
 const score = document.getElementById('score');
@@ -5,8 +7,8 @@ const score = document.getElementById('score');
 let displayWidth = gameDisplay.width;
 let displayHeight = gameDisplay.height;
 
-let dx = 10;
-let dy = 10;
+let dx = 5;
+let dy = 5;
 
 let isRightPressed = false;
 let isLeftPressed = false;
@@ -17,16 +19,13 @@ let isAppleEaten = false;
 let isGameOver = false;
 let currentX = null;
 let currentY = null;
-let direction = null;
-let snakeNeedsToGrow = false
-
-
 let currPositionsHead = [];
-let currentPositionHead = null;
 
-let randomAppleX =  (Math.floor((Math.random() * (390 /10))) *10) + 10;
-let randomAppleY =  (Math.floor((Math.random() * (290 /10))) *10) + 10;
-
+let rightClick = null;
+let leftClick = null;
+let upClick = null;
+let downClick = null;
+let timing = 100;
 
 class Snake {
   constructor(x, y, radius){
@@ -59,34 +58,68 @@ class Apple {
   } 
 }
 
-const apple = new Apple(randomAppleX, randomAppleY, 10);
+
+const getRandomAppleX = () => {
+  let randomAppleX =  (Math.floor((Math.random() * (390 /10))) *10) + 10;
+  if(randomAppleX === 0 || randomAppleX === 10 || randomAppleX === 390){
+     randomAppleX = (Math.floor((Math.random() * (390 /10))) *10) + 10
+  }
+  return randomAppleX;
+}
+
+const getRandomAppleY = () => {
+  let randomAppleY =  (Math.floor((Math.random() * (290 /10))) *10) + 10;
+  if(randomAppleY === 0 || randomAppleY === 10 || randomAppleY === 290){
+     randomAppleY = (Math.floor((Math.random() * (290 /10))) *10) + 10
+  }
+  return randomAppleY;
+}
+
+
+const apple = new Apple (getRandomAppleX(), getRandomAppleY(), 5);
 
 const snake = {
-  head: [new Snake(40, 150, 10)],
+  head: [new Snake(40, 140, 5)],
   
-  body: [new Snake(30, 150, 10)],
+  body: [new Snake(30, 140, 5)],
   currentPositionHead: [],
   prevPositionHead: [],
-  nextPrevPositions: [],
   direction: null
 }
+
 let snakeHead = snake.head[0];
 let snakeDirection = snake.direction;
+
+
+const applePlacement = () => {
+  for(let i = 0; i < snake.body.length; i++){
+  if(apple.x === snakeHead.x || apple.x === snake.body[i].x && apple.y === snakeHead.y || apple.y === snake.body[i].y){
+    apple.x = getRandomAppleX()
+    apple.y = getRandomAppleY()
+  }
+ } 
+}
+
+applePlacement()
+
 
 const createApple = () => {
   apple.drawApple();
 }
 
+
+
 const createSnakeHead = () => {
   snakeHead.drawSnake();
 }
+
 
 const createSnakeBody = () => {
   for(let i = 0; i < snake.body.length; i++){
   snake.body[i].drawSnake()
   }
-  //console.log(snake.body.length)
 }
+
 
 window.onload = () => {
   createSnakeHead()
@@ -101,7 +134,7 @@ const updateCurrentPosition = () => {
   snake.prevPositionHead = currPositionsHead[currPositionsHead.length - 2];
  
   if(snake.prevPositionHead){
-    snake.body.push(new Snake(snake.prevPositionHead[0], snake.prevPositionHead[1], 10))
+    snake.body.push(new Snake(snake.prevPositionHead[0], snake.prevPositionHead[1], 5))
     if(snake.body.length > (pointsCount + 1)){
       snake.body.shift()
     }
@@ -123,20 +156,24 @@ const right = () => {
   currentY = snakeHead.y 
 }
 
+
 const left = () => {
   currentX = snakeHead.x += -dx;
   currentY = snakeHead.y
 }
+
 
 const up = () => {
   currentX = snakeHead.x
   currentY = snakeHead.y += -dy 
 }
 
+
 const down = () => {
   currentX = snakeHead.x
   currentY = snakeHead.y += dy 
 }
+
 
 const clearIntervalsRightLeft = (interval) => {
   if(isUpPressed === true || isDownPressed === true){
@@ -144,121 +181,243 @@ const clearIntervalsRightLeft = (interval) => {
  }
 }
 
+
 const clearIntervalsUpDown = (interval) => {
   if(isRightPressed === true || isLeftPressed === true){
     clearInterval(interval) 
  }
 }
- 
-const moveSnake = (e) => {
-  e.preventDefault()
+
+
+
+
+const rightInterval = () => {
+  const rightInt = setInterval(() => {  
+    snakeMovement()
+    right()
+    gameOverIfSnakeHitsTheWallLeftRight(rightInt)
+    gameOverIfSnakeHitsTheWallUpDown(rightInt)
+    gameOverIfSnakeHitsHimself()
+    snakeEatsTheApple()
+    clearIntervalsRightLeft(rightInt)
+    isRightPressed = false; 
+  }, timing) 
+}
+
+
+
+const leftInterval = () => {
+  const leftInt = setInterval(() => {     
+    snakeMovement()
+    left()
+    gameOverIfSnakeHitsTheWallLeftRight(leftInt)
+    gameOverIfSnakeHitsTheWallUpDown(leftInt)
+    gameOverIfSnakeHitsHimself()
+    snakeEatsTheApple()
+    clearIntervalsRightLeft(leftInt)
+    isLeftPressed = false;
+ }, timing) 
+}
+
+
+
+const upInterval = () => {
+  const upInt = setInterval(() => {
+    snakeMovement()
+    up()
+    gameOverIfSnakeHitsTheWallLeftRight(upInt)
+    gameOverIfSnakeHitsTheWallUpDown(upInt)
+    gameOverIfSnakeHitsHimself()
+    snakeEatsTheApple()
+    clearIntervalsUpDown(upInt)
+    isUpPressed = false;
+ }, timing) 
+}
+
+
+
+const downInterval = () => {
+  const downInt = setInterval(() => {
+    snakeMovement()
+    down()
+    gameOverIfSnakeHitsTheWallLeftRight(downInt)
+    gameOverIfSnakeHitsTheWallUpDown(downInt)
+    gameOverIfSnakeHitsHimself()
+    snakeEatsTheApple()
+    clearIntervalsUpDown(downInt)
+    isDownPressed = false;
+ }, timing) 
+}
+
+
+
+const moveSnakeRight = (e) => {
   if(isGameOver === false){
-  if(e.keyCode === 39){
+    if(e.keyCode === 39){
+      rightClick++
+      leftClick = 1;
+      upClick = null;
+      downClick = null; 
+    moveRight()
+  }
+ }
+}
+
+const moveRight = () => {
+  if(rightClick === 1){
     isRightPressed = true;
-    const rightInt = setInterval(() => {
-      snakeMovement()
-      right()
-      gameOverIfSnakeHitsTheWall(rightInt)
-      //gameOverIfSnakeHitsHimself(rightInt)
-      snakeEatsTheApple()
-      clearIntervalsRightLeft(rightInt)
-      isRightPressed = false;
-   }, 100)  
-  }else if(e.keyCode === 37){
+    rightInterval()
+   }
+}
+
+
+
+const moveSnakeLeft = (e) => {
+  if(isGameOver === false){
+    if(e.keyCode === 37){
+      leftClick++
+      rightClick = 1;
+      upClick = null;
+      downClick = null;
+     moveLeft()
+    }
+   }
+  }
+
+const moveLeft = () => {
+  if(leftClick === 1){
     isLeftPressed = true;
-    const leftInt = setInterval(() => {
-      snakeMovement()
-      left()
-      gameOverIfSnakeHitsTheWall(leftInt)
-      //gameOverIfSnakeHitsHimself(leftInt)
-      snakeEatsTheApple()
-      clearIntervalsRightLeft(leftInt)
-      isLeftPressed = false;
-   }, 100)  
-  }else if(e.keyCode === 38){
-    isUpPressed = true;
-    const upInt = setInterval(() => {
-      snakeMovement()
-      up()
-      gameOverIfSnakeHitsTheWall(upInt)
-      //gameOverIfSnakeHitsHimself(upInt)
-      snakeEatsTheApple()
-      clearIntervalsUpDown(upInt)
-      isUpPressed = false;
-   }, 100)   
-  }else if(e.keyCode === 40){
-    isDownPressed = true;
-    const downInt = setInterval(() => {
-      snakeMovement()
-      down()
-      gameOverIfSnakeHitsTheWall(downInt)
-      //gameOverIfSnakeHitsHimself(downInt)
-      snakeEatsTheApple()
-      clearIntervalsUpDown(downInt)
-      isDownPressed = false;
-   }, 100)   
+    leftInterval()
   }
 }
+
+
+const moveSnakeUp = (e) => {
+  if(isGameOver === false){
+    if(e.keyCode === 38){
+      upClick++
+      downClick = 1;
+      rightClick = null;
+      leftClick = null;
+     moveUp()
+   }
+ }
+}
+
+const moveUp = () => {
+  if(upClick === 1){
+    isUpPressed = true;
+    upInterval()
+  }
 }
 
 
+const moveSnakeDown = (e) => {
+  if(isGameOver === false){
+    if(e.keyCode === 40){
+      downClick++
+      upClick = 1;
+      rightClick = null;
+      leftClick = null;
+    moveDown()
+  }
+ }
+}
 
-document.addEventListener('keydown', moveSnake);
+const moveDown = () => {
+  if(downClick === 1){
+    isDownPressed = true;
+    downInterval()
+  }
+}
+
+document.addEventListener('keydown', moveSnakeRight);
+document.addEventListener('keydown', moveSnakeLeft);
+document.addEventListener('keydown', moveSnakeUp);
+document.addEventListener('keydown', moveSnakeDown);
+
+
+
+const scoreTextContent = (message) => {
+  score.textContent = message
+}
 
 const changeScoreTextContent = () => {
-  score.textContent = 'GAME OVER!' 
+  scoreTextContent('GAME OVER!')
   isGameOver = true;
 }
 
-const gameOverIfSnakeHitsTheWall = (interval) => {
-  if(snakeHead.x + dx > (displayWidth - 5)+ snakeHead.radius || snakeHead.x + dx < (5 + snakeHead.radius)){
+
+const gameOverIfSnakeHitsTheWallLeftRight = (interval) => {
+  if(snakeHead.x + dx > displayWidth - (snakeHead.radius) || snakeHead.x + dx <  snakeHead.radius){
      clearInterval(interval);
      changeScoreTextContent();
   }
-  if(snakeHead.y + dy > (displayHeight - 5) + snakeHead.radius  || snakeHead.y + dy  < (5 + snakeHead.radius)){
+}
+
+const gameOverIfSnakeHitsTheWallUpDown = (interval) => {
+  if(snakeHead.y + dy > displayHeight - (snakeHead.radius)  || snakeHead.y + dy  <  snakeHead.radius){
      clearInterval(interval);
      changeScoreTextContent();
    } 
  }
 
- const gameOverIfSnakeHitsHimself = (interval) => {
-   for(let i = 1; i < snake.body.length; i++){
-    let x = snakeHead.x - snake.body[i - 1].x
-    let y = snakeHead.y - snake.body[i - 1].y
-    let distance = Math.sqrt(x * x + y * y)
-
-    if(distance < snakeHead.radius + (snake.body[i].radius/2)){
-      clearInterval(interval);
-      changeScoreTextContent();
-    }
-   }
-  
- }
 
 const updatePoints = () => {
   pointsCount++
   isAppleEaten = true;
-  snakeNeedsToGrow = true;
-  score.textContent = `Score :  ${pointsCount}`;
+  scoreTextContent(`Score :  ${pointsCount}`) ;
 }
+
+if(DEBUG === true){
+ dx = 10
+ dy = 10
+}
+
+
+const getDistance = (x1, y1, x2, y2) => {
+   let x = x2 - x1;
+   let y = y2 - y1;
+   let distance = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+   return distance
+}
+
+
+
+const changeAppleCordinates = () => {
+  apple.x = -30;
+  apple.y = -30;
+}
+
+
 
 const snakeEatsTheApple = () => {
-  let x = snakeHead.x - apple.x;
-  let y = snakeHead.y - apple.y;
-  let distance = Math.sqrt(x * x + y * y);
- 
-  if(distance < snakeHead.radius + (apple.radius/2)){
-    apple.x = -30;
-    apple.y = -30;
+   if(getDistance(apple.x, apple.y, snakeHead.x, snakeHead.y) < (apple.radius + snakeHead.radius)){
+    changeAppleCordinates()
     updatePoints()
     newApple()
-  } 
+   }
 }
 
-const newPlacementForApple = () => {
-  apple.x = (Math.floor((Math.random() * (290 /10))) *10) + 10;
-  apple.y = (Math.floor((Math.random() * (290 /10))) *10) + 10;
+
+
+const gameOverIfSnakeHitsHimself = () => {
+      for(let i = 0; i < snake.body.length; i++){
+    if(getDistance( snake.body[i].x, snake.body[i].y, snakeHead.x, snakeHead.y) < (snake.body[i].radius + snakeHead.radius)){
+      console.log('game over')
+    //clearInterval(interval)
+    //changeScoreTextContent();
+   }
+ }
 }
+
+
+
+const newPlacementForApple = () => {
+  apple.x = getRandomAppleX();
+  apple.y = getRandomAppleY();
+}
+
 
 const newApple = () => {
   if(isAppleEaten === true){
